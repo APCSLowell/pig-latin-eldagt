@@ -1,67 +1,58 @@
 String[] lines = new String[8];
 
 void setup() {
-  tester();
-}
-
-void tester() {
+  // Try reading the file
   try {
-    File myFile = new File("words.txt");
-    Scanner myReader = new Scanner(myFile);
+    String[] fileLines = loadStrings("words.txt"); // load the file contents
     int counter = 0;
-    while (myReader.hasNextLine()) {
-      String data = myReader.nextLine();
-      lines[counter] = data;
+    for (String line : fileLines) {
+      lines[counter] = line;
       counter++;
     }
-    myReader.close();
-  } catch (FileNotFoundException e) {
+  } catch (Exception e) {
     println("An error occurred.");
     e.printStackTrace();
   }
-
+  
   println("There are " + lines.length + " lines.");
+  
+  // Process each line and convert it to Pig Latin
   for (int i = 0; i < lines.length; i++) {
     if (lines[i] != null) {
-      println(pigLatin(lines[i]));
+      String pigLatinWord = pigLatin(lines[i]);
+      println("Original: " + lines[i] + " -> Pig Latin: " + pigLatinWord);
     }
   }
-}
-
-int findFirstVowel(String sWord) {
-  sWord = sWord.toLowerCase();
-  for (int x = 0; x < sWord.length(); x++) {
-    char ch = sWord.charAt(x);
-    if ("aeiou".indexOf(ch) >= 0) {
-      return x;
-    }
-  }
-  return -1;
 }
 
 String pigLatin(String sWord) {
-  if (sWord == null || sWord.length() == 0) {
-    return sWord;
+  String sWordLower = sWord.toLowerCase();
+  int firstVowelIndex = -1;
+  String consonantCluster = "";
+
+  // Find the first vowel index
+  for (int x = 0; x < sWordLower.length(); x++) {
+    char ch = sWordLower.charAt(x);
+    if ("aeiou".indexOf(ch) >= 0) {
+      firstVowelIndex = x;
+      break;
+    } else {
+      consonantCluster += ch;
+    }
   }
 
-  int firstVowelIndex = findFirstVowel(sWord);
-
+  // If no vowel is found, return the word + "ay"
   if (firstVowelIndex == -1) {
     return sWord + "ay";
   }
 
-  if (firstVowelIndex == 0) {
-    return sWord + "way";
-  }
-
-  String consonantCluster = sWord.substring(0, firstVowelIndex);
+  // Create the Pig Latin word
   String restOfWord = sWord.substring(firstVowelIndex);
-
   String pigLatinWord = restOfWord + consonantCluster + "ay";
 
+  // Preserve the capitalization of the original word
   if (Character.isUpperCase(sWord.charAt(0))) {
-    pigLatinWord = Character.toUpperCase(pigLatinWord.charAt(0)) + pigLatinWord.substring(1);
+    pigLatinWord = pigLatinWord.substring(0, 1).toUpperCase() + pigLatinWord.substring(1);
   }
-
   return pigLatinWord;
 }
